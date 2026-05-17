@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudScale UML Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'forest' });</script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 90%; max-width: 900px; margin-bottom: 30px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #a855f7; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #34495e; margin-top: 25px; font-size: 1.2rem; }
+        p { color: #666; font-size: 0.9rem; line-height: 1.6; }
+        .diagram-box { border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-top: 15px; background: #fafafa; display: flex; justify-content: center; }
+        .footer { font-size: 0.8rem; color: #999; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>CloudScale Budget Guard: UML Diagrams</h1>
+        <p>These diagrams represent the architectural and data structure of the CloudScale platform. You can right-click any diagram to save it as an image.</p>
+
+        <h2>1. Class Diagram (Backend Data Entities)</h2>
+        <p>Shows the relationships between Organizations, Departments, Employees, and User Accounts.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+                classDiagram
+                    class Organization {
+                        +Long id
+                        +String name
+                        +String plan
+                        +Long monthlySpend
+                        +String license
+                    }
+                    class Department {
+                        +Long id
+                        +Long organizationId
+                        +String name
+                        +Long budget
+                        +Long spent
+                    }
+                    class Employee {
+                        +Long id
+                        +Long departmentId
+                        +String firstName
+                        +String email
+                        +String role
+                    }
+                    class AppUser {
+                        +String username
+                        +String password
+                        +String role
+                    }
+                    
+                    Organization "1" -- "*" Department : contains
+                    Department "1" -- "*" Employee : manages
+                    Organization "1" -- "1" AppUser : has admin
+                    Department "1" -- "1" AppUser : has manager
+            </pre>
+        </div>
+
+        <h2>2. Sequence Diagram (User Login Flow)</h2>
+        <p>Illustrates the step-by-step communication during the authentication process.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+                sequenceDiagram
+                    participant User
+                    participant React_Frontend
+                    participant SpringBoot_Controller
+                    participant AppUser_Service
+                    participant H2_Database
+
+                    User->>React_Frontend: Enters credentials & clicks Login
+                    React_Frontend->>SpringBoot_Controller: POST /api/auth/login (JSON)
+                    SpringBoot_Controller->>AppUser_Service: login(username, password)
+                    AppUser_Service->>H2_Database: SELECT * FROM app_users WHERE username = ?
+                    H2_Database-->>AppUser_Service: User Record Found
+                    AppUser_Service-->>SpringBoot_Controller: UserDTO (Success)
+                    SpringBoot_Controller-->>React_Frontend: 200 OK + Profile Data
+                    React_Frontend-->>User: Redirect to Dashboard
+            </pre>
+        </div>
+
+        <h2>3. Component Diagram (System Architecture)</h2>
+        <p>Displays the high-level physical components and their data flow.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+                graph TD
+                    subgraph Client_Side
+                        UI[React 19 / Vite]
+                        Auth[AuthContext]
+                        Axios[Axios / API Layer]
+                    end
+
+                    subgraph Server_Side
+                        REST[Spring Boot REST Controllers]
+                        Logic[Service Layer]
+                        JPA[Spring Data JPA / Hibernate]
+                    end
+
+                    subgraph Storage
+                        H2[(H2 File-based DB)]
+                    end
+
+                    UI --> Auth
+                    Auth --> Axios
+                    Axios -- HTTP/JSON --> REST
+                    REST --> Logic
+                    Logic --> JPA
+                    JPA --> H2
+            </pre>
+        </div>
+
+        <h2>4. System Flow Diagram (End-to-End Data Flow)</h2>
+        <p>This flow chart tracks how data moves from a user's click to the physical database and back to the live graphs.</p>
+        <div class="diagram-box">
+            <pre class="mermaid">
+                flowchart LR
+                    User([User Action]) --> UI[React Component]
+                    UI --> State{Update State?}
+                    State -- Yes --> UI
+                    UI --> API[Axios REST Call]
+                    
+                    subgraph Backend_Process
+                        API --> Ctrl[Spring Controller]
+                        Ctrl --> Svc[Service Logic]
+                        Svc --> Creds[Auth Generation]
+                        Svc --> Repo[JPA Repository]
+                    end
+                    
+                    Repo --> DB[(H2 Database)]
+                    DB -- Success --> Repo
+                    Repo -- Data --> Svc
+                    Svc -- JSON --> Ctrl
+                    Ctrl -- HTTP 200/201 --> API
+                    API -- Response --> UI
+                    UI -- Re-render --> Charts[Recharts Visualization]
+            </pre>
+        </div>
+    </div>
+
+    <div class="footer">
+        Generated by CloudScale Architecture Guard &bull; 2026
+    </div>
+
+</body>
+</html>

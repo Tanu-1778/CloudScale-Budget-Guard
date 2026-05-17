@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: cloud-cost-manager
+  datasource:
+    url: jdbc:mysql://localhost:3306/clouddb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: password
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+server:
+  port: ${PORT:8080}
+
+
+logging:
+  level:
+    root: INFO
+    com.cloud: DEBUG
