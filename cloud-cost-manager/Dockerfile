@@ -21,3 +21,6 @@ EXPOSE 8080
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Fixed the path from /app/cloud/... to /app/frontend/...
+COPY --from=frontend-build /app/frontend/backend/src/main/resources/static ./src/main/resources/static
