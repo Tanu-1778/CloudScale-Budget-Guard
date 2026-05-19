@@ -2,10 +2,10 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS build-stage
 WORKDIR /app
 
-# Since Root Directory is 'cloud-cost-manager', 
-# these files are now in the current folder (.)
-COPY pom.xml .
-COPY src ./src
+# Copy files from the specific folder in your repo
+# We copy the pom and src from the 'cloud-cost-manager' directory
+COPY cloud-cost-manager/pom.xml .
+COPY cloud-cost-manager/src ./src
 
 # Build the JAR file
 RUN mvn clean package -DskipTests
@@ -14,11 +14,12 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy the JAR from the build stage
+# Copy the built JAR file
 COPY --from=build-stage /app/target/*.jar app.jar
 
-# Render requirements
+# Standard Render port
 ENV PORT=8080
 EXPOSE 8080
 
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
