@@ -1,30 +1,24 @@
-# --- STEP 1: Build the React Frontend ---
-FROM node:20-alpine AS frontend-builder
-WORKDIR /app/frontend
-# We assume the 'cloud' folder is in your GitHub root
-COPY cloud/package*.json ./
-RUN npm install
-COPY cloud/ ./
-RUN npm run build
+# Stage 1: Build the Spring Boot Backend
+FROM maven:3.9.9-eclipse-temurin-21 AS build-stage
+WORKDIR /app
 
-# --- STEP 2: Build the Spring Boot Backend ---
-FROM maven:3.9.9-eclipse-temurin-21 AS backend-builder
-WORKDIR /app/backend
-# Copy the backend files from your root
+# Copy the pom.xml and the entire src folder (which includes your static frontend)
 COPY pom.xml .
 COPY src ./src
-# Copy the built React files into Spring Boot's static folder
-COPY --from=frontend-builder /app/frontend/dist ./src/main/resources/static
-# Build the final JAR
+
+# Build the JAR file
 RUN mvn clean package -DskipTests
 
-# --- STEP 3: Create the final Run Image ---
+# Stage 2: Final Runtime Image
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=backend-builder /app/backend/target/*.jar app.jar
 
-# Render requirements
+# Copy the JAR from the build stage
+COPY --from=build-stage /app/target/*.jar app.jar
+
+# Render uses the PORT environment variable (default 8080)
 ENV PORT=8080
 EXPOSE 8080
 
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
