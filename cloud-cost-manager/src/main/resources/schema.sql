@@ -1,10 +1,11 @@
--- CloudScale Budget Guard - Database Schema for PostgreSQL
+-- CloudScale Budget Guard - Database Schema for MySQL
 
--- Note: No 'CREATE DATABASE' or 'USE' needed on Render/PostgreSQL
+CREATE DATABASE IF NOT EXISTS clouddb;
+USE clouddb;
 
 -- Table: app_users
 CREATE TABLE IF NOT EXISTS app_users (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
     role VARCHAR(20) NOT NULL,
@@ -18,7 +19,7 @@ CREATE TABLE IF NOT EXISTS app_users (
 
 -- Table: organizations
 CREATE TABLE IF NOT EXISTS organizations (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     plan VARCHAR(50),
     users INT,
@@ -39,7 +40,7 @@ CREATE TABLE IF NOT EXISTS organizations (
 
 -- Table: departments
 CREATE TABLE IF NOT EXISTS departments (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT,
     name VARCHAR(100) NOT NULL,
     employee_count INT,
@@ -54,7 +55,7 @@ CREATE TABLE IF NOT EXISTS departments (
 
 -- Table: employees
 CREATE TABLE IF NOT EXISTS employees (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT,
     department_id BIGINT,
     first_name VARCHAR(50),
@@ -71,15 +72,15 @@ CREATE TABLE IF NOT EXISTS employees (
 
 -- Table: servers
 CREATE TABLE IF NOT EXISTS servers (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     type VARCHAR(50),
     region VARCHAR(50),
     status VARCHAR(20),
     mode VARCHAR(20),
-    cpu DOUBLE PRECISION,
-    memory DOUBLE PRECISION,
-    cost DOUBLE PRECISION,
+    cpu DOUBLE,
+    memory DOUBLE,
+    cost DOUBLE,
     uptime VARCHAR(50),
     is_protected BOOLEAN,
     organization_id BIGINT,
@@ -91,23 +92,23 @@ CREATE TABLE IF NOT EXISTS servers (
 
 -- Table: budgets
 CREATE TABLE IF NOT EXISTS budgets (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT,
     department_id BIGINT,
     employee_id BIGINT,
-    total_budget DOUBLE PRECISION,
-    spent DOUBLE PRECISION,
-    remaining DOUBLE PRECISION,
+    total_budget DOUBLE,
+    spent DOUBLE,
+    remaining DOUBLE,
     currency VARCHAR(10),
     last_updated BIGINT
 );
 
 -- Table: billing
 CREATE TABLE IF NOT EXISTS billing (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT,
     invoice_number VARCHAR(50),
-    amount DOUBLE PRECISION,
+    amount DOUBLE,
     status VARCHAR(20),
     billing_date VARCHAR(20),
     due_date VARCHAR(20),
@@ -116,7 +117,7 @@ CREATE TABLE IF NOT EXISTS billing (
 
 -- Table: schedules
 CREATE TABLE IF NOT EXISTS schedules (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     server_id BIGINT,
     start_time VARCHAR(20),
     end_time VARCHAR(20),
@@ -128,7 +129,7 @@ CREATE TABLE IF NOT EXISTS schedules (
 
 -- Table: action_logs
 CREATE TABLE IF NOT EXISTS action_logs (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     type VARCHAR(20),
     msg TEXT,
     time VARCHAR(20),

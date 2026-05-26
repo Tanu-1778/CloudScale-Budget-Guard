@@ -53,11 +53,10 @@
         </dependency>
 
         <!-- MySQL Driver -->
-<!-- Replace the mysql-connector-j dependency with this -->
         <dependency>
-           <groupId>org.postgresql</groupId>
-           <artifactId>postgresql</artifactId>
-           <version>42.7.2</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.1.0</version>
         </dependency>
 
         <!-- Spring Boot Web (Keep for embedded Tomcat) -->
