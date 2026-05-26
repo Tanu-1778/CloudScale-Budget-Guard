@@ -5,37 +5,30 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * JDBC Utility class for MySQL database connection
+ * JDBC Utility class for PostgreSQL database connection
  */
 public class DBUtil {
-    private static final String URL = System.getenv("DB_URL") != null ? System.getenv("DB_URL") : "jdbc:mysql://localhost:3306/clouddb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USERNAME = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "root";
-    private static final String PASSWORD = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "";
-    private static final String[] PASSWORDS = {"tiger", "password", "root", ""};
+    // 1. Update the default URL to use PostgreSQL format
+    private static final String URL = System.getenv("DB_URL") != null 
+        ? System.getenv("DB_URL") 
+        : "jdbc:postgresql://localhost:5432/clouddb";
+        
+    private static final String USERNAME = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "postgres";
+    private static final String PASSWORD = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "password";
 
     static {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            // 2. Update the Driver to PostgreSQL
+            Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.err.println("MySQL Driver not found!");
+            System.err.println("PostgreSQL Driver not found!");
             e.printStackTrace();
         }
     }
 
     public static Connection getConnection() throws SQLException {
-        if (System.getenv("DB_URL") != null) {
-            return DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        }
-        
-        SQLException lastException = null;
-        for (String pass : PASSWORDS) {
-            try {
-                return DriverManager.getConnection(URL, USERNAME, pass);
-            } catch (SQLException e) {
-                lastException = e;
-            }
-        }
-        throw lastException;
+        // Simple connection logic for PostgreSQL
+        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 
     public static void close(Connection conn) {
